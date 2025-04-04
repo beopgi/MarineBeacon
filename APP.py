@@ -1,5 +1,5 @@
 # pydeck 기반 GPS 실시간 위치 추적 시스템 (기존 구조 유지, 지도만 교체)
-
+#APP.py
 from dash import Dash, html, dcc, Input, Output, State
 import dash_deck
 import pydeck as pdk
@@ -7,6 +7,7 @@ import json
 import websocket
 import threading
 import time
+import requests
 
 WEBSOCKET_SERVER = "ws://localhost:8000/ws"
 
@@ -101,15 +102,21 @@ def create_layer(data):
     State("team-name", "value")
 )
 def update_map(n, team_name):
-    if not real_time_data:
+    try:
+        response = requests.get("http://localhost:8000/locations")  # FastAPI에서 위치 받아옴
+        data = response.json()
+    except Exception as e:
+        print("[API 호출 실패]", e)
         return pdk.Deck(initial_view_state=initial_view).to_json()
 
-    filtered = [d for d in real_time_data if not team_name or d["team"].lower() == team_name.lower()]
+    filtered = [d for d in data if not team_name or d["team"].lower() == team_name.lower()]
     layers = create_layer(filtered)
-    deck = pdk.Deck(layers=layers, initial_view_state=initial_view)
+    deck = pdk.Deck(
+        layers=layers,
+        initial_view_state=initial_view,
+        map_style='mapbox://styles/mapbox/light-v9'  # 지도 스타일 추가
+    )
     return deck.to_json()
-
-threading.Thread(target=websocket_listener, daemon=True).start()
 
 if __name__ == "__main__":
     app.run_server(debug=True, port=8050)
