@@ -24,13 +24,13 @@ function startTracking() {
   }
 
   // WebSocket 연결
-  socket = new WebSocket("ws://localhost:8000");
+  socket = new WebSocket("ws://14.63.214.199:8080");
 
   socket.onopen = () => {
-    console.log("✅ WebSocket 연결됨");
-    statusEl.textContent = `📡 추적 중 (${team})`;
+    console.log("WebSocket 연결됨");
+    statusEl.textContent = `추적 중 (${team})`;
 
-    // ✅ 5초마다 위치 가져오기
+    // 5초마다 위치 가져오기
     intervalId = setInterval(() => {
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -55,9 +55,9 @@ function startTracking() {
           map.setView(latlng, map.getZoom());
         },
         error => {
-          console.error("❌ 위치 추적 오류:", error);
+          console.error("위치 추적 오류:", error);
 
-          let msg = "📍 위치 정보를 가져올 수 없습니다.";
+          let msg = "위치 정보를 가져올 수 없습니다.";
           if (error.code === error.PERMISSION_DENIED) {
             msg += "\n위치 권한이 차단되어 있습니다.";
           } else if (error.code === error.POSITION_UNAVAILABLE) {
@@ -74,8 +74,8 @@ function startTracking() {
   };
 
   socket.onerror = err => {
-    console.error("❌ WebSocket 오류:", err);
-    statusEl.textContent = "❌ WebSocket 연결 실패";
+    console.error("WebSocket 오류:", err);
+    statusEl.textContent = "WebSocket 연결 실패";
     clearInterval(intervalId);
   };
 }

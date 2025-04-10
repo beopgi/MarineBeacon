@@ -1,0 +1,35 @@
+# .github/workflows/deploy.yml
+name: Deploy to Cloud via Docker Hub
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 코드 체크아웃
+      uses: actions/checkout@v3
+
+    - name: Docker Hub 로그인
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Docker 이미지 빌드 및 푸시
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
+
+    - name: 클라우드 서버에 접속해서 최신 이미지 Pull 및 실행
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASS }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          docker stop marinebeacon || true
+          docker rm marinebeacon || true
+          docker pull ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
+          docker run -d --restart=always -p 8080:8000 --name marinebeacon ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest

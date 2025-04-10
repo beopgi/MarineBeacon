@@ -39,14 +39,14 @@ wss.on("connection", (ws) => {
         [team, lat, lon, mysqlTimestamp],
         (err) => {
           if (err) {
-            console.error("❌ DB 저장 오류:", err);
+            console.error("DB 저장 오류:", err);
           } else {
-            console.log("✅ 위치 저장됨:", team, lat, lon, mysqlTimestamp);
+            console.log("위치 저장됨:", team, lat, lon, mysqlTimestamp);
           }
         }
       );
     } catch (e) {
-      console.error("❌ 메시지 파싱 실패:", e);
+      console.error("메시지 파싱 실패:", e);
     }
   });
 });
@@ -58,5 +58,5 @@ app.get("/", (req, res) => {
 
 // 서버 실행
 server.listen(8000, () => {
-  console.log("🚀 서버 실행 중: http://localhost:8000");
+  console.log("서버 실행 중: http://14.63.214.199:8080");
 });
