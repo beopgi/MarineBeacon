@@ -24,7 +24,7 @@ function startTracking() {
   }
 
   // WebSocket 연결
-  socket = new WebSocket("ws://14.63.214.199:8080");
+  socket = new WebSocket("ws://14.63.214.199:8050");
 
   socket.onopen = () => {
     console.log("WebSocket 연결됨");
