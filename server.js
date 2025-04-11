@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // MySQL 연결 설정
 const db = mysql.createConnection({
-  host: "mysql-container",
+  host: "localhost",
   user: "root",
   password: "5625",
   database: "marine_db"
