@@ -24,14 +24,14 @@ db.connect();
 
 // WebSocket 처리
 wss.on("connection", (ws) => {
-  console.log("📡 WebSocket 연결됨");
+  console.log("WebSocket 연결됨");
 
   ws.on("message", (message) => {
     try {
       const data = JSON.parse(message);
       const { team, lat, lon, timestamp } = data;
 
-      // ✅ MySQL에서 인식 가능한 DATETIME 포맷으로 변환
+      //MySQL에서 인식 가능한 DATETIME 포맷으로 변환
       const mysqlTimestamp = new Date(timestamp).toISOString().slice(0, 19).replace("T", " ");
 
       db.query(

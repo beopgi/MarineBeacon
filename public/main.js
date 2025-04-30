@@ -43,7 +43,7 @@ function startTracking() {
 
           if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify(data));
-            console.log("📡 위치 전송:", data);
+            console.log("위치 전송:", data);
           }
 
           const latlng = [data.lat, data.lon];
@@ -70,7 +70,7 @@ function startTracking() {
         },
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
       );
-    }, 5000); // 🔁 5초마다 실행
+    }, 5000); //5초마다 실행
   };
 
   socket.onerror = err => {

@@ -40,4 +40,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
             docker stop marinebeacon || true
             docker rm marinebeacon || true
-            docker run --network bridge --name marinebeacon-container -p 8080:8000 ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
+            docker run --network my_network --name marinebeacon -p 8080:8000 ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
