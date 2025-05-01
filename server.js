@@ -57,6 +57,6 @@ app.get("/", (req, res) => {
 });
 
 // 서버 실행
-server.listen(8050, () => {
+server.listen(8000, () => {
   console.log("서버 실행 중: http://14.63.214.199:8050");
 });
