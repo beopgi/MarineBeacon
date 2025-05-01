@@ -31,5 +31,6 @@ jobs:
           docker stop marinebeacon || true
           docker rm marinebeacon || true
           docker pull ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
-          docker run -d --restart=always -p 8080:8000 --name marinebeacon ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
+          docker run -d --restart=always --network my_network -p 8050:8000 --name marinebeacon ${{ secrets.DOCKER_USERNAME }}/marinebeacon:latest
+
 
