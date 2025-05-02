@@ -62,7 +62,7 @@ function startTracking() {
     watchId = navigator.geolocation.watchPosition(
       position => {
         const data = {
-          team: team,
+          team: encodeURIComponent(team),
           lat: position.coords.latitude,
           lon: position.coords.longitude,
           timestamp: new Date().toISOString()

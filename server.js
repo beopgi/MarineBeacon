@@ -37,6 +37,7 @@ wss.on("connection", (ws) => {
     try {
       const data = JSON.parse(message);
       const { team, lat, lon, timestamp } = data;
+      const decodedTeam = decodeURIComponent(team);
 
       //한국 시간대로 변환
       const original = new Date(timestamp);
@@ -48,7 +49,7 @@ wss.on("connection", (ws) => {
       // DB 저장
       db.query(
         "INSERT INTO gps_logs (team_name, latitude, longitude, timestamp) VALUES (?, ?, ?, ?)",
-        [team, lat, lon, mysqlTimestamp],
+        [decodedTeam, lat, lon, mysqlTimestamp],
         (err) => {
           if (err) {
             console.error("DB 저장 오류:", err);
