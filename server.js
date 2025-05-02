@@ -26,6 +26,7 @@ db.connect(err => {
     console.error("MySQL 연결 실패:", err);
   } else {
     console.log("MySQL 연결 성공");
+    db.query("SET NAMES utf8mb4");
   }
 });
 
