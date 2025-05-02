@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>MarineBeacon - 실시간 GPS 추적</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
@@ -12,14 +12,21 @@
       background: #f0f0f0;
       text-align: center;
     }
+    #team-list {
+      padding: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      background: #eee;
+    }
   </style>
 </head>
 <body>
   <div id="team-form">
-    <label>팀명: <input type="text" id="team-name" placeholder="TeamA" /></label>
+    <label>팀명: <input type="text" id="team-name" placeholder="팀명을 입력해 주세요." /></label>
     <button onclick="startTracking()">시작</button>
     <span id="status"></span>
   </div>
+  <div id="team-list"></div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
