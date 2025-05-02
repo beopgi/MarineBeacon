@@ -54,7 +54,7 @@ wss.on("connection", (ws) => {
           if (err) {
             console.error("DB 저장 오류:", err);
           } else {
-            console.log("위치 저장됨:", team, lat, lon, mysqlTimestamp);
+            console.log("위치 저장됨:", decodedTeam, lat, lon, mysqlTimestamp);
           }
         }
       );

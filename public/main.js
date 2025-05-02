@@ -34,6 +34,7 @@ function updateTeamList(team, isMine) {
 
 function startTracking() {
   team = document.getElementById("team-name").value.trim();
+  const encodedTeam = encodeURIComponent(team); // ✅ 전송용 별도 저장
   const statusEl = document.getElementById("status");
 
   if (!team) {
@@ -58,11 +59,10 @@ function startTracking() {
     console.log("WebSocket 연결됨");
     statusEl.textContent = `추적 중 (${team})`;
 
-    // 위치 추적 시작
     watchId = navigator.geolocation.watchPosition(
       position => {
         const data = {
-          team: encodeURIComponent(team),
+          team: encodedTeam,  // ✅ 전송에는 인코딩된 팀명 사용
           lat: position.coords.latitude,
           lon: position.coords.longitude,
           timestamp: new Date().toISOString()
@@ -116,26 +116,26 @@ function startTracking() {
   socket.onmessage = event => {
     try {
       const data = JSON.parse(event.data);
-      const { team: incomingTeam, lat, lon } = data;
-      const latlng = [lat, lon];
-      const color = getTeamColor(incomingTeam);
+      const decodedTeam = decodeURIComponent(data.team);  // ✅ 받은 팀명 복호화
+      const latlng = [data.lat, data.lon];
+      const color = getTeamColor(decodedTeam);
 
-      updateTeamList(incomingTeam, incomingTeam === team);
+      updateTeamList(decodedTeam, decodedTeam === team);
 
-      if (!markers[incomingTeam]) {
-        markers[incomingTeam] = L.circleMarker(latlng, {
+      if (!markers[decodedTeam]) {
+        markers[decodedTeam] = L.circleMarker(latlng, {
           radius: 10,
           color: color,
           fillColor: color,
           fillOpacity: 1
-        }).addTo(map).bindPopup(`팀: ${incomingTeam}`);
+        }).addTo(map).bindPopup(`팀: ${decodedTeam}`);
       } else {
-        markers[incomingTeam].setLatLng(latlng);
+        markers[decodedTeam].setLatLng(latlng);
       }
 
-      if (incomingTeam === team) {
+      if (decodedTeam === team) {
         map.setView(latlng, map.getZoom());
-        markers[incomingTeam].openPopup();
+        markers[decodedTeam].openPopup();
       }
     } catch (e) {
       console.error("WebSocket 메시지 처리 오류:", e);
