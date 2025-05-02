@@ -15,8 +15,8 @@ app.use(express.static(path.join(__dirname, "public")));
 // MySQL 연결 설정
 const db = mysql.createConnection({
   host: "mysql-container", // 도커 네트워크 기반 주소
-  user: "root",
-  password: "5625",
+  user: "marine_user",
+  password: "marine1234",
   database: "marine_db",
   charset: "utf8mb4"
 });
@@ -26,7 +26,6 @@ db.connect(err => {
     console.error("MySQL 연결 실패:", err);
   } else {
     console.log("MySQL 연결 성공");
-    db.query("SET NAMES utf8mb4");
   }
 });
 
