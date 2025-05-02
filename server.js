@@ -17,7 +17,8 @@ const db = mysql.createConnection({
   host: "mysql-container", // 도커 네트워크 기반 주소
   user: "root",
   password: "5625",
-  database: "marine_db"
+  database: "marine_db",
+  charset: "utf8mb4"
 });
 
 db.connect(err => {

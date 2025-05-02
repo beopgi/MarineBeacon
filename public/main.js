@@ -1,9 +1,9 @@
 let socket = null;
 let map = null;
 let team = "";
-let intervalId = null;
-const markers = {};      // 팀별 마커 저장
-const teamColors = {};   // 팀별 색상 저장
+let watchId = null;
+const markers = {};
+const teamColors = {};
 
 function getTeamColor(team) {
   if (!teamColors[team]) {
@@ -50,7 +50,7 @@ function startTracking() {
     }).addTo(map);
   }
 
-  updateTeamList(team, true); // 내 팀 리스트에 추가
+  updateTeamList(team, true);
 
   socket = new WebSocket("ws://14.63.214.199:8050");
 
@@ -58,41 +58,62 @@ function startTracking() {
     console.log("WebSocket 연결됨");
     statusEl.textContent = `추적 중 (${team})`;
 
-    intervalId = setInterval(() => {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const data = {
-            team: team,
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-            timestamp: new Date().toISOString()
-          };
+    // 위치 추적 시작
+    watchId = navigator.geolocation.watchPosition(
+      position => {
+        const data = {
+          team: team,
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+          timestamp: new Date().toISOString()
+        };
 
-          if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify(data));
-            console.log("위치 전송:", data);
-          }
-        },
-        error => {
-          console.error("위치 추적 오류:", error);
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify(data));
+          console.log("위치 전송:", data);
+        }
 
-          let msg = "위치 정보를 가져올 수 없습니다.";
-          if (error.code === error.PERMISSION_DENIED) {
-            msg += "\n위치 권한이 차단되어 있습니다.";
-          } else if (error.code === error.POSITION_UNAVAILABLE) {
-            msg += "\n위치 정보를 사용할 수 없습니다.";
-          } else if (error.code === error.TIMEOUT) {
-            msg += "\n위치 요청이 시간 초과되었습니다.";
-          }
+        const latlng = [data.lat, data.lon];
+        const color = getTeamColor(team);
+        updateTeamList(team, true);
 
-          alert(msg + "\n브라우저 위치 권한을 확인해주세요.");
-        },
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-      );
-    }, 5000); // 5초마다 실행
+        if (!markers[team]) {
+          markers[team] = L.circleMarker(latlng, {
+            radius: 10,
+            color: color,
+            fillColor: color,
+            fillOpacity: 1
+          }).addTo(map).bindPopup(`팀: ${team}`);
+        } else {
+          markers[team].setLatLng(latlng);
+        }
+
+        map.setView(latlng, map.getZoom());
+        markers[team].openPopup();
+      },
+      error => {
+        console.warn("위치 추적 오류:", error);
+
+        let msg = "위치 정보를 가져올 수 없습니다.";
+        if (error.code === error.PERMISSION_DENIED) {
+          msg += " (위치 권한이 차단되어 있습니다)";
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          msg += " (위치 정보를 사용할 수 없습니다)";
+        } else if (error.code === error.TIMEOUT) {
+          msg += " (위치 요청이 시간 초과되었습니다)";
+        }
+
+        statusEl.textContent = msg + " - 재시도 중...";
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 10000
+      }
+    );
   };
 
-  socket.onmessage = (event) => {
+  socket.onmessage = event => {
     try {
       const data = JSON.parse(event.data);
       const { team: incomingTeam, lat, lon } = data;
@@ -112,12 +133,10 @@ function startTracking() {
         markers[incomingTeam].setLatLng(latlng);
       }
 
-      // 내 팀이면 지도 중심 이동
       if (incomingTeam === team) {
         map.setView(latlng, map.getZoom());
         markers[incomingTeam].openPopup();
       }
-
     } catch (e) {
       console.error("WebSocket 메시지 처리 오류:", e);
     }
@@ -126,6 +145,6 @@ function startTracking() {
   socket.onerror = err => {
     console.error("WebSocket 오류:", err);
     statusEl.textContent = "WebSocket 연결 실패";
-    clearInterval(intervalId);
+    if (watchId) navigator.geolocation.clearWatch(watchId);
   };
 }
