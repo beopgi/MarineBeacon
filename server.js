@@ -38,8 +38,12 @@ wss.on("connection", (ws) => {
       const data = JSON.parse(message);
       const { team, lat, lon, timestamp } = data;
 
-      // MySQL DATETIME 포맷으로 변환
-      const mysqlTimestamp = new Date(timestamp).toISOString().slice(0, 19).replace("T", " ");
+      //한국 시간대로 변환
+      const original = new Date(timestamp);
+      const mysqlTimestamp = new Date(original.getTime() + 9 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ");
 
       // DB 저장
       db.query(
@@ -54,7 +58,7 @@ wss.on("connection", (ws) => {
         }
       );
 
-      // 모든 연결된 클라이언트에게 데이터 브로드캐스트
+      //데이터 브로드캐스트
       wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(data));
