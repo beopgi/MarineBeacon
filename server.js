@@ -83,5 +83,5 @@ app.get("/", (req, res) => {
 
 // 서버 실행
 server.listen(8000, () => {
-  console.log("서버 실행 중: ws://14.63.214.199:8050");
+  console.log("서버 실행 중: wss://between-personal-announcement-range.trycloudflare.com");
 });

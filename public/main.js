@@ -53,7 +53,7 @@ function startTracking() {
 
   updateTeamList(team, true);
 
-  socket = new WebSocket("ws://14.63.214.199:8050");
+  socket = new WebSocket("wss://between-personal-announcement-range.trycloudflare.com");
 
   socket.onopen = () => {
     console.log("WebSocket 연결됨");
